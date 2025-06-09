@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Optional
 
 class PlanManager:
     def __init__(self, plans_dir: str = "plans"):
@@ -24,81 +24,28 @@ class PlanManager:
         return os.path.join(user_dir, "pregnancy_plan.md")
     
     def read_plan(self, username: str) -> Optional[str]:
-        """Read a user's pregnancy plan."""
+        """Read a user's pregnancy plan. Returns None if no plan exists."""
         plan_path = self.get_plan_path(username)
         if os.path.exists(plan_path):
             with open(plan_path, 'r') as f:
-                return f.read()
+                x = f.read()
+                print(f"Plan for {username}: {x}\n")
+                return x
         return None
 
     def write_plan(self, username: str, content: str) -> None:
-        """Write or update a user's pregnancy plan."""
+        """Write or completely replace a user's pregnancy plan."""
         plan_path = self.get_plan_path(username)
-        print(f"Writing plan for {username}")
-        with open(plan_path, 'w') as f:
-            f.write(content)
-
-    def update_plan_section(self, username: str, section: str, content: str) -> None:
-        """Update a specific section of a user's pregnancy plan."""
-        print(f"Updating plan section for {username}")
-        current_plan = self.read_plan(username) or ""
+        print(f"Writing plan for {username}\n")
         
-        # If the section already exists, update it
-        section_header = f"## {section}\n"
-        if section_header in current_plan:
-            # Split the content into sections
-            sections = current_plan.split("## ")
-            new_sections = []
-            for s in sections:
-                if s.startswith(section):
-                    new_sections.append(f"{section}\n{content}\n")
-                else:
-                    new_sections.append(s)
-            new_plan = "## ".join(new_sections)
-        else:
-            # Add new section
-            new_plan = f"{current_plan}\n\n{section_header}{content}\n"
-        
-        self.write_plan(username, new_plan)
+        # If no plan exists, create one with basic structure
+        if not os.path.exists(plan_path):
+            header = f"""# Pregnancy Plan for {username}
 
-    def get_plan_metadata(self, username: str) -> Dict:
-        """Get metadata about a user's plan."""
-        plan_path = self.get_plan_path(username)
-        if os.path.exists(plan_path):
-            return {
-                "last_updated": datetime.fromtimestamp(os.path.getmtime(plan_path)).isoformat(),
-                "file_size": os.path.getsize(plan_path),
-                "plan_path": plan_path
-            }
-        return {
-            "last_updated": None,
-            "file_size": 0,
-            "plan_path": plan_path
-        }
+*Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')}*
 
-    def initialize_user_plan(self, username: str) -> None:
-        """Initialize a new user's plan with a basic structure."""
-        if not self.read_plan(username):
-            print(f"Initializing plan for {username}")
-            initial_content = f"""# Pregnancy Plan for {username}
-
-## Personal Information
-- Created: {datetime.now().strftime('%Y-%m-%d')}
-
-## Medical Information
-- Due Date: TBD
-- Healthcare Provider: TBD
-
-## Appointments
-- No appointments scheduled yet
-
-## Notes
-- Add your pregnancy-related notes here
-
-## Questions for Healthcare Provider
-- Add your questions here
-
-## Resources
-- Add helpful resources and links here
 """
-            self.write_plan(username, initial_content) 
+            content = header + content
+        
+        with open(plan_path, 'w') as f:
+            f.write(content) 
