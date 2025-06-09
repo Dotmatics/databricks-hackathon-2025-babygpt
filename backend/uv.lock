@@ -666,6 +666,7 @@ dependencies = [
     { name = "fastapi" },
     { name = "langchain" },
     { name = "langchain-community" },
+    { name = "langchain-mcp-adapters" },
     { name = "langgraph" },
     { name = "langsmith" },
     { name = "pydantic" },
@@ -684,6 +685,7 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.115.12" },
     { name = "langchain", specifier = ">=0.3.25" },
     { name = "langchain-community", specifier = ">=0.3.21" },
+    { name = "langchain-mcp-adapters", specifier = ">=0.1.7" },
     { name = "langgraph", specifier = ">=0.4.8" },
     { name = "langsmith", specifier = ">=0.3.45" },
     { name = "pydantic", specifier = ">=2.11.5" },
@@ -1571,6 +1573,19 @@ wheels = [
 ]
 
 [[package]]
+name = "langchain-mcp-adapters"
+version = "0.1.7"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "langchain-core" },
+    { name = "mcp" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/01/5f/f6d2b724f7100bd53e4413a72dd7b77a61e5284549c9de63ba043e63d163/langchain_mcp_adapters-0.1.7.tar.gz", hash = "sha256:b5d0ab520211d8c12cfc4df83fd6335f8197a3557ee7ca4f14e3380846610535", size = 20023, upload-time = "2025-06-05T20:18:39.425Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/01/05/b6cf2f4651c9429b374c8837117ecc0619bfb8b6e106ce8390f2c932a293/langchain_mcp_adapters-0.1.7-py3-none-any.whl", hash = "sha256:6b3ded5f51b311e67cefa87b500f776c454caf2269d2eae4b2338ecec19a9258", size = 13318, upload-time = "2025-06-05T20:18:38.477Z" },
+]
+
+[[package]]
 name = "langchain-text-splitters"
 version = "0.3.8"
 source = { registry = "https://pypi.org/simple" }
@@ -1837,6 +1852,26 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/3d/d1/f54d43e95384b312ffa4a74a4326c722f3b8187aaaa12e9a84cdf3037131/matplotlib-3.10.3-pp310-pypy310_pp73-macosx_10_15_x86_64.whl", hash = "sha256:86ab63d66bbc83fdb6733471d3bff40897c1e9921cba112accd748eee4bce5e4", size = 8162896, upload-time = "2025-05-08T19:10:46.432Z" },
     { url = "https://files.pythonhosted.org/packages/24/a4/fbfc00c2346177c95b353dcf9b5a004106abe8730a62cb6f27e79df0a698/matplotlib-3.10.3-pp310-pypy310_pp73-macosx_11_0_arm64.whl", hash = "sha256:a48f9c08bf7444b5d2391a83e75edb464ccda3c380384b36532a0962593a1751", size = 8039702, upload-time = "2025-05-08T19:10:49.634Z" },
     { url = "https://files.pythonhosted.org/packages/6a/b9/59e120d24a2ec5fc2d30646adb2efb4621aab3c6d83d66fb2a7a182db032/matplotlib-3.10.3-pp310-pypy310_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:cb73d8aa75a237457988f9765e4dfe1c0d2453c5ca4eabc897d4309672c8e014", size = 8594298, upload-time = "2025-05-08T19:10:51.738Z" },
+]
+
+[[package]]
+name = "mcp"
+version = "1.9.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "httpx" },
+    { name = "httpx-sse" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+    { name = "python-multipart" },
+    { name = "sse-starlette" },
+    { name = "starlette" },
+    { name = "uvicorn", marker = "sys_platform != 'emscripten'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f2/df/8fefc0c6c7a5c66914763e3ff3893f9a03435628f6625d5e3b0dc45d73db/mcp-1.9.3.tar.gz", hash = "sha256:587ba38448e81885e5d1b84055cfcc0ca56d35cd0c58f50941cab01109405388", size = 333045, upload-time = "2025-06-05T15:48:25.681Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/79/45/823ad05504bea55cb0feb7470387f151252127ad5c72f8882e8fe6cf5c0e/mcp-1.9.3-py3-none-any.whl", hash = "sha256:69b0136d1ac9927402ed4cf221d4b8ff875e7132b0b06edd446448766f34f9b9", size = 131063, upload-time = "2025-06-05T15:48:24.171Z" },
 ]
 
 [[package]]
@@ -2693,6 +2728,15 @@ wheels = [
 ]
 
 [[package]]
+name = "python-multipart"
+version = "0.0.20"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f3/87/f44d7c9f274c7ee665a29b885ec97089ec5dc034c7f3fafa03da9e39a09e/python_multipart-0.0.20.tar.gz", hash = "sha256:8dd0cab45b8e23064ae09147625994d090fa46f5b0d1e13af944c331a7fa9d13", size = 37158, upload-time = "2024-12-16T19:45:46.972Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/45/58/38b5afbc1a800eeea951b9285d3912613f2603bdf897a4ab0f4bd7f405fc/python_multipart-0.0.20-py3-none-any.whl", hash = "sha256:8a62d3a8335e06589fe01f2a3e178cdcc632f3fbe0d492ad9ee0ec35aab1f104", size = 24546, upload-time = "2024-12-16T19:45:44.423Z" },
+]
+
+[[package]]
 name = "pytz"
 version = "2025.2"
 source = { registry = "https://pypi.org/simple" }
@@ -3066,6 +3110,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e5/40/edede8dd6977b0d3da179a342c198ed100dd2aba4be081861ee5911e4da4/sqlparse-0.5.3.tar.gz", hash = "sha256:09f67787f56a0b16ecdbde1bfc7f5d9c3371ca683cfeaa8e6ff60b4807ec9272", size = 84999, upload-time = "2024-12-10T12:05:30.728Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a9/5c/bfd6bd0bf979426d405cc6e71eceb8701b148b16c21d2dc3c261efc61c7b/sqlparse-0.5.3-py3-none-any.whl", hash = "sha256:cf2196ed3418f3ba5de6af7e82c694a9fbdbfecccdfc72e281548517081f16ca", size = 44415, upload-time = "2024-12-10T12:05:27.824Z" },
+]
+
+[[package]]
+name = "sse-starlette"
+version = "2.3.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8c/f4/989bc70cb8091eda43a9034ef969b25145291f3601703b82766e5172dfed/sse_starlette-2.3.6.tar.gz", hash = "sha256:0382336f7d4ec30160cf9ca0518962905e1b69b72d6c1c995131e0a703b436e3", size = 18284, upload-time = "2025-05-30T13:34:12.914Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/81/05/78850ac6e79af5b9508f8841b0f26aa9fd329a1ba00bf65453c2d312bcc8/sse_starlette-2.3.6-py3-none-any.whl", hash = "sha256:d49a8285b182f6e2228e2609c350398b2ca2c36216c2675d875f81e93548f760", size = 10606, upload-time = "2025-05-30T13:34:11.703Z" },
 ]
 
 [[package]]
