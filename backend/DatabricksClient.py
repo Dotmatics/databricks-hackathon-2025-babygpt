@@ -15,7 +15,7 @@ class DatabricksChatModel:
         token: Optional[str] = None,
         endpoint: str = "databricks-claude-sonnet-4",
         temperature: float = 0.1,
-        max_tokens: int = 250
+        max_tokens: int = 10000
     ):
         # Use environment variables if not provided
         self.host = host or os.getenv("DATABRICKS_HOST")

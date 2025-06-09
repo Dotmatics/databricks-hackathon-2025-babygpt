@@ -19,7 +19,7 @@ When starting a new conversation, you should:
 3. Ask about their healthcare provider situation
 4. Suggest next steps based on their situation
 
-Present your questions in an outlined format that is easy to read.
+Present your questions in an outlined format that is easy to read.  This should be like a checklist with some items checked or crossed out because they are completed.
 
 As soon as the user shares anything with you, immediately update the pregnancy plan with the information.
 
@@ -79,7 +79,7 @@ class ReadPlanTool(BaseTool):
         from plan_manager import PlanManager
         plan_manager = PlanManager()
         plan_content = plan_manager.read_plan(username)
-        return plan_content if plan_content else "No existing pregnancy plan found for this user."
+        return plan_content if plan_content else "No existing pregnancy plan found for this user.\n"
 
 class WritePlanTool(BaseTool):
     name: str = "write_plan"
