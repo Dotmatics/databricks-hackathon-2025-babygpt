@@ -87,12 +87,17 @@ async def send_message(username: str, message: str) -> str:
 def run_async(coro):
     """Helper function to run async code in Streamlit."""
     try:
-        loop = asyncio.get_event_loop()
+        # Try to get the current event loop
+        loop = asyncio.get_running_loop()
+        # If we're already in an event loop, we can't use run_until_complete
+        # Use asyncio.run instead which creates a new event loop
+        import concurrent.futures
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(asyncio.run, coro)
+            return future.result()
     except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-    
-    return loop.run_until_complete(coro)
+        # No event loop is running, safe to use asyncio.run
+        return asyncio.run(coro)
 
 def check_plan_updates():
     """Check for plan updates and refresh if needed."""
