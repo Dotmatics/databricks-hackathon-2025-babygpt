@@ -7,7 +7,17 @@ from langchain_core.language_models import BaseChatModel
 from DatabricksClient import DatabricksChatModel
 from plan_manager import PlanManager
 from pydantic import Field
+from langchain_mcp_adapters.client import MultiServerMCPClient
+import os
+from dotenv import load_dotenv
+import asyncio
 
+# Load environment variables from the backend folder
+env_path = os.path.join(os.path.dirname(__file__), '.env')
+dotenv_loaded = load_dotenv(env_path)
+
+
+#
 SYSTEM_PROMPT = """You are a knowledgeable and compassionate pregnancy support assistant with advanced capabilities to help users select healthcare providers and manage appointments. Your role is to provide accurate, up-to-date information and guidance to help people navigate their pregnancy journey from conception to birth.
 Anyone who talks to you will already have been identified as pregnant.
 
@@ -65,6 +75,56 @@ Use these tools to maintain detailed, organized pregnancy plans for each user. Y
 
 # Note: create_react_agent uses its own state management with messages
 
+nimble_token = os.getenv("NIMBLE_TOKEN",'')
+
+client = MultiServerMCPClient({
+    "nimble": {
+        "url": "https://mcp.nimbleway.com/sse",
+        "transport": "sse",
+        "headers": {
+            "Authorization": f"Bearer {nimble_token}"
+        }
+    }
+})
+
+mcp_tools = asyncio.run(client.get_tools())
+nimble_agent = create_react_agent(
+    model=DatabricksChatModel().chat_model,
+    tools=mcp_tools,
+    prompt="Using the tools provided your aim is to provide the best options for OBGYN provider"
+)
+
+class GetOBGYNProviderOptions(BaseTool):
+    name: str = "find_provider"
+    description: str = "Finds OBGYN providers based on the user's location"
+
+    def _run(self) -> str:
+        from chat_graph_manager import current_location_context
+        location = getattr(current_location_context, 'location', None)
+        if not location:
+            return "Please set your location first using the set_users_location tool"
+
+        try:
+            result = nimble_agent.invoke({"messages": [{"role": "user", "content": f"What OBGYN Providers are available near {location}"}]})
+            # Extract the final message content from the result
+        
+            if isinstance(result, dict) and 'messages' in result:
+                return result['messages'][-1].content if result['messages'] else "No providers found"
+            return str(result)
+        except Exception as e:
+            return f"Error finding providers: {str(e)}"
+
+
+class SetUsersLocation(BaseTool):
+    name: str = "set_users_location"
+    description: str = "Set the user's location"
+    def _run(self, location: str) -> str:
+        from chat_graph_manager import current_location_context
+        current_location_context.location = location
+        return "Location set successfully you can now use the find_provider tool to find OBGYN providers"
+
+    
+
 class ReadPlanTool(BaseTool):
     name: str = "read_plan"
     description: str = "Read the current pregnancy plan for the user"
@@ -102,12 +162,19 @@ class UsernameContext:
     def __init__(self):
         self.username = None
 
+class LocationContext:
+    def __init__(self):
+        self.location = None
+
+current_location_context = LocationContext()
 current_username_context = UsernameContext()
 
 # Create tool instances
 tools = [
     ReadPlanTool(),
-    WritePlanTool()
+    WritePlanTool(),
+    GetOBGYNProviderOptions(),
+    SetUsersLocation()
 ]
 
 class ChatGraphManager:
