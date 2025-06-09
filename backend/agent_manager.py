@@ -24,8 +24,7 @@ class AgentManager:
                 "content": "",
                 "last_updated": datetime.now().isoformat()
             }
-            # Initialize the user's plan with a basic structure
-            self.plan_manager.initialize_user_plan(username)
+            # Note: Plan will be automatically initialized when first written to by the agent
             
             # Create initial message to start the conversation
             initial_message = {
@@ -34,7 +33,10 @@ class AgentManager:
                 "timestamp": datetime.now().isoformat()
             }
             
-            # Process the initial message
+            # Add to conversation history
+            self.conversation_history[username].append(initial_message)
+            
+            # Process the conversation (which now has the initial message)
             async for chunk in self.process_message(username, initial_message["content"]):
                 yield chunk
 
@@ -52,17 +54,27 @@ class AgentManager:
         self.conversation_history[username].append(user_message)
 
         try:
-            # Process message through ChatGraphManager
-            for event in self.chat_graph.stream_message(user_message, username):
+            # Convert conversation history to the format expected by LangGraph
+            langgraph_messages = []
+            for msg in self.conversation_history[username]:
+                langgraph_messages.append({
+                    "role": msg["role"],
+                    "content": msg["content"]
+                })
+            
+            # Process message through ChatGraphManager with full history
+            response_content = ""
+            for event in self.chat_graph.stream_message(langgraph_messages, username):
                 for value in event.values():
                     if "messages" in value and value["messages"]:
                         response = value["messages"][-1]
+                        response_content = response.content
                         yield response.content
 
             # Add assistant response to history
             self.conversation_history[username].append({
                 "role": "assistant",
-                "content": response.content,
+                "content": response_content,
                 "timestamp": datetime.now().isoformat()
             })
 

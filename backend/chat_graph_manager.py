@@ -11,12 +11,15 @@ from pydantic import Field
 SYSTEM_PROMPT = """You are a knowledgeable and compassionate pregnancy support assistant with advanced capabilities to help users select healthcare providers and manage appointments. Your role is to provide accurate, up-to-date information and guidance to help people navigate their pregnancy journey from conception to birth.
 Anyone who talks to you will already have been identified as pregnant.
 
+When the conversation starts, read the pregnancy plan for the user and use it to start the conversation.
+
 When starting a new conversation, you should:
 1. Welcome the user warmly
 2. Ask about their current stage of pregnancy (if known)
 3. Ask about their healthcare provider situation
-4. Offer to help create or update their pregnancy plan
-5. Suggest next steps based on their situation
+4. Suggest next steps based on their situation
+
+Present your questions in an outlined format that is easy to read.
 
 As soon as the user shares anything with you, immediately update the pregnancy plan with the information.
 
@@ -58,13 +61,13 @@ Always encourage users to consult with their healthcare provider for personalize
 
 After every interaction with the user, you should consider and update the pregnancy plan with any information that is relevant to the user's pregnancy.
 
-Use these tools to maintain detailed, organized pregnancy plans for each user.  You should not refer to them directly in your conversation to the user, just use them after every conversation."""
+Use these tools to maintain detailed, organized pregnancy plans for each user. You should not refer to them directly in your conversation to the user, just use them after every conversation."""
 
 # Note: create_react_agent uses its own state management with messages
 
 class ReadPlanTool(BaseTool):
     name: str = "read_plan"
-    description: str = "Read the current pregnancy plan"
+    description: str = "Read the current pregnancy plan for the user"
     
     def _run(self) -> str:
         # Get the username from the graph manager instance
@@ -75,11 +78,12 @@ class ReadPlanTool(BaseTool):
         
         from plan_manager import PlanManager
         plan_manager = PlanManager()
-        return plan_manager.read_plan(username) or "No plan found"
+        plan_content = plan_manager.read_plan(username)
+        return plan_content if plan_content else "No existing pregnancy plan found for this user."
 
 class WritePlanTool(BaseTool):
     name: str = "write_plan"
-    description: str = "Write or update the entire pregnancy plan"
+    description: str = "Write or completely update the pregnancy plan for the user with new content"
     
     def _run(self, content: str) -> str:
         # Get the username from the graph manager instance
@@ -91,38 +95,7 @@ class WritePlanTool(BaseTool):
         from plan_manager import PlanManager
         plan_manager = PlanManager()
         plan_manager.write_plan(username, content)
-        return "Plan updated successfully"
-
-class UpdatePlanSectionTool(BaseTool):
-    name: str = "update_plan_section"
-    description: str = "Update a specific section of the pregnancy plan"
-    
-    def _run(self, section: str, content: str) -> str:
-        # Get the username from the graph manager instance
-        from chat_graph_manager import current_username_context
-        username = getattr(current_username_context, 'username', None)
-        if not username:
-            return "No username available"
-        
-        from plan_manager import PlanManager
-        plan_manager = PlanManager()
-        plan_manager.update_plan_section(username, section, content)
-        return f"Section '{section}' updated successfully"
-
-class GetPlanMetadataTool(BaseTool):
-    name: str = "get_plan_metadata"
-    description: str = "Get metadata about the pregnancy plan"
-    
-    def _run(self) -> Dict:
-        # Get the username from the graph manager instance
-        from chat_graph_manager import current_username_context
-        username = getattr(current_username_context, 'username', None)
-        if not username:
-            return {"error": "No username available"}
-        
-        from plan_manager import PlanManager
-        plan_manager = PlanManager()
-        return plan_manager.get_plan_metadata(username)
+        return "Pregnancy plan updated successfully"
 
 # Global context to pass username to tools
 class UsernameContext:
@@ -134,9 +107,7 @@ current_username_context = UsernameContext()
 # Create tool instances
 tools = [
     ReadPlanTool(),
-    WritePlanTool(),
-    UpdatePlanSectionTool(),
-    GetPlanMetadataTool()
+    WritePlanTool()
 ]
 
 class ChatGraphManager:
@@ -152,31 +123,31 @@ class ChatGraphManager:
             prompt=SYSTEM_PROMPT
         )
 
-    def process_message(self, message: Dict, username: str) -> Dict:
-        """Process a message through the LangGraph."""
-        print(f"Processing message for username: {username}")
+    def process_message(self, messages: List[Dict], username: str) -> Dict:
+        """Process messages with full conversation history through the LangGraph."""
+        print(f"Processing message for username: {username}\n")
         
         # Set the username in global context for tools to access
         current_username_context.username = username
         
         try:
-            # Process the message using create_react_agent
-            result = self.graph.invoke({"messages": [message]})
+            # Process the messages using create_react_agent with full history
+            result = self.graph.invoke({"messages": messages})
             return result
         finally:
             # Clean up the context
             current_username_context.username = None
 
-    def stream_message(self, message: Dict, username: str):
-        """Stream a message through the LangGraph."""
-        print(f"Streaming message for username: {username}")
+    def stream_message(self, messages: List[Dict], username: str):
+        """Stream messages with full conversation history through the LangGraph."""
+        print(f"Streaming message for username: {username}\n")
         
         # Set the username in global context for tools to access
         current_username_context.username = username
         
         try:
-            # Stream the message using create_react_agent
-            for chunk in self.graph.stream({"messages": [message]}):
+            # Stream the messages using create_react_agent with full history
+            for chunk in self.graph.stream({"messages": messages}):
                 yield chunk
         finally:
             # Clean up the context

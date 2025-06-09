@@ -13,7 +13,7 @@ class DatabricksChatModel:
         self,
         host: Optional[str] = None,
         token: Optional[str] = None,
-        endpoint: str = "databricks-meta-llama-3-3-70b-instruct",
+        endpoint: str = "databricks-claude-sonnet-4",
         temperature: float = 0.1,
         max_tokens: int = 250
     ):
