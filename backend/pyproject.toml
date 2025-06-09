@@ -1,0 +1,22 @@
+[project]
+name = "databricks-hackathon-2024-babygpt"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "databricks-agents>=0.22.1",
+    "databricks-langchain>=0.5.1",
+    "databricks-sdk>=0.56.0",
+    "databricks-sql-connector>=4.0.3",
+    "fastapi>=0.115.12",
+    "langchain>=0.3.25",
+    "langchain-community>=0.3.21",
+    "langgraph>=0.4.8",
+    "langsmith>=0.3.45",
+    "pydantic>=2.11.5",
+    "python-dotenv>=1.1.0",
+    "unitycatalog-langchain[databricks]>=0.2.0",
+    "uvicorn>=0.34.3",
+    "websockets>=15.0.1",
+]
